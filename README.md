@@ -1,3 +1,77 @@
+# Spring PetClinic — Production Deployment
+
+A real-world Spring Boot application (forked from the official [Spring PetClinic](https://github.com/spring-projects/spring-petclinic) reference project), containerized and deployed to AWS with a full production-grade DevOps pipeline.
+
+**Live demo:** [petclinic.mhhuzaifa.com](https://petclinic.mhhuzaifa.com)
+
+---
+
+## What this project demonstrates
+
+This isn't a toy "hello world" deployment it's a real, database-backed Java application deployed the way production systems actually run:
+
+- **Multi-stage Docker build** — compiles the Java app in a Maven build stage, then copies only the final artifact into a lightweight runtime image (keeps final image small and secure)
+- **Multi-container orchestration** — app + MySQL database, connected via Docker's internal networking, with persistent volumes so data survives container restarts
+- **Reverse proxy + SSL** — Nginx handles all public traffic, terminates HTTPS (Let's Encrypt), and proxies internally to the app
+- **CI/CD pipeline** — GitHub Actions automatically builds and deploys on every push to `main`, with zero manual server intervention
+- **Security hardening** — only ports 22/80/443 exposed publicly; database and app ports stay internal-only
+
+---
+
+## Architecture
+
+```mermaid
+graph TD
+    A[Internet] -->|HTTPS| B[Nginx<br/>Reverse Proxy + SSL]
+    B --> C[Spring Boot App<br/>Docker container, port 8080]
+    C --> D[(MySQL<br/>Persistent volume)]
+    E[GitHub] -->|push to main| F[GitHub Actions]
+    F -->|SSH deploy| C
+
+    style A fill:#e6f1fb,stroke:#185fa5
+    style B fill:#e6f1fb,stroke:#185fa5
+    style C fill:#e1f5ee,stroke:#0f6e56
+    style D fill:#faeeda,stroke:#854f0b
+    style E fill:#eeedfe,stroke:#534ab7
+    style F fill:#eeedfe,stroke:#534ab7
+```
+
+---
+
+## Tech stack
+
+- **Application:** Java 17, Spring Boot, Maven
+- **Database:** MySQL 9.7
+- **Containerization:** Docker, Docker Compose
+- **Web server:** Nginx (reverse proxy + SSL termination)
+- **CI/CD:** GitHub Actions
+- **Infrastructure:** AWS EC2
+- **SSL:** Let's Encrypt (Certbot)
+
+---
+
+## Running locally
+
+```bash
+git clone https://github.com/mhhuzaifa223-pixel/spring-petclinic.git
+cd spring-petclinic
+docker compose up -d
+```
+
+App will be available at `http://localhost:8080`
+
+---
+
+## Deployment
+
+Pushing to `main` automatically triggers deployment via GitHub Actions:
+
+---
+
+## Original project
+
+This is a fork of the official [Spring PetClinic](https://github.com/spring-projects/spring-petclinic) reference application, used here to demonstrate production deployment and DevOps practices on a real Java application.
+
 # Spring PetClinic Sample Application [![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml)[![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml)
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/spring-projects/spring-petclinic) [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=7517918)
